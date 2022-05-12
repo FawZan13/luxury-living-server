@@ -19,6 +19,7 @@ async function run() {
         await client.connect();
         const database = client.db('luxuryLiving');
         const servicesCollection = database.collection('services');
+        const orderCollection = database.collection('myOrders');
         const usersCollection = database.collection('users');
         const reviewsCollection = database.collection('reviews');
 
@@ -113,6 +114,37 @@ async function run() {
 
 
         })
+        //add order
+        app.post('/myOrders', async (req, res) => {
+            await orderCollection.insertOne(req.body).then((result) => {
+                res.send(result)
+            })
+
+        })
+        //get my orders
+        app.get('/myOrders/:email', async (req, res) => {
+            const result = await orderCollection.find({ email: req.params.email }).toArray();
+            res.send(result);
+        });
+        //delete myOrders
+        app.delete("/deleteOrder/:id", async (req, res) => {
+            const result = await orderCollection.deleteOne({
+                _id: ObjectId(req.params.id),
+            });
+            res.send(result);
+        });
+        //delete Products
+        app.delete("/deleteService/:id", async (req, res) => {
+            const result = await productsCollection.deleteOne({
+                _id: ObjectId(req.params.id),
+            });
+            res.send(result);
+        });
+        // all orderss
+        app.get("/allOrders", async (req, res) => {
+            const result = await orderCollection.find({}).toArray();
+            res.send(result);
+        });
 
     }
     finally {
